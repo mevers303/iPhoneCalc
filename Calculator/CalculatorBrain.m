@@ -7,6 +7,7 @@
 //
 
 #import "CalculatorBrain.h"
+#import <math.h>
 
 
 @interface CalculatorBrain()
@@ -26,6 +27,13 @@
         _operandStack = [[NSMutableArray alloc] init];
     }
     return _operandStack;
+}
+
+
+- (void)clearStack {
+    
+    [self.operandStack removeAllObjects];
+    
 }
 
 
@@ -63,6 +71,16 @@
         double temp = [self popOperand];
         result = [self popOperand] / temp;
     }
+    else if ([operation isEqualToString:@"sin"])
+        result = sin([self popOperand]);
+    else if ([operation isEqualToString:@"cos"])
+        result = cos([self popOperand]);
+    else if ([operation isEqualToString:@"sqrt"])
+        result = sqrt([self popOperand]);
+    else if ([operation isEqualToString:@"pi"])
+        result = M_PI;
+    
+    
     
     [self pushOperand:result];
     

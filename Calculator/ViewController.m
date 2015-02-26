@@ -35,9 +35,28 @@
 }
 
 
+- (void)appendToBrainDisplay:(NSString *)string {
+    
+    // add to secondary display first
+    self.brainDisplay.text = [[self.brainDisplay.text stringByAppendingString:@" "] stringByAppendingString:string];
+    
+}
+
+
 - (IBAction)digitPressed:(UIButton *)sender {
     
     NSString *digit = [sender currentTitle];
+    
+    
+    // if the user tries to enter a "." when there's already one in the string,
+    // exit the function.
+    if ([digit isEqualToString:@"."])
+    {
+        if ([self.display.text rangeOfString:@"."].location != NSNotFound)
+            return;
+    }
+    
+    
     
     if (self.userIsInTheMiddleOfEnteringANumber) {
         self.display.text = [self.display.text stringByAppendingString:digit];
@@ -51,8 +70,14 @@
 
 - (IBAction)enterPressed
 {
+    
+    // add to secondary display
+    [self appendToBrainDisplay:self.display.text];
+    
+    
     [self.brain pushOperand:[self.display.text doubleValue]];
     self.userIsInTheMiddleOfEnteringANumber = NO;
+    
 }
 
 
@@ -63,9 +88,45 @@
     if (self.userIsInTheMiddleOfEnteringANumber)
         [self enterPressed];
     
+    
     NSString *operation = [sender currentTitle];
     double result = [self.brain performOperation:operation];
     self.display.text = [NSString stringWithFormat:@"%g", result];
+    
+    // add to secondary display
+    [self appendToBrainDisplay:operation];
+    [self appendToBrainDisplay:@"="];
+    [self appendToBrainDisplay:self.display.text];
+                              
 }
 
+- (IBAction)clearPressed:(id)sender {
+    
+    self.display.text = @"0";
+    self.brainDisplay.text = nil;
+    [self.brain clearStack];
+    
+}
+
+- (IBAction)backspacePressed:(id)sender {
+    
+    if (self.display.text.length > 0)
+    {
+        
+        self.display.text = [self.display.text substringToIndex:(self.display.text.length - 1)];
+        
+        if (self.display.text.length == 0)
+            self.display.text = @"0";
+        
+    }
+}
+
+- (IBAction)negativePressed:(id)sender {
+    
+    if ([[self.display.text substringToIndex:1] isEqualToString:@"-"])
+        self.display.text = [self.display.text substringFromIndex:1];
+    else
+        self.display.text = [@"-" stringByAppendingString:self.display.text];
+    
+}
 @end
